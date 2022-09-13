@@ -1,13 +1,45 @@
 // xBridge360 - Servidor
+  
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <errno.h>
 
-#include "xbridge360.h"
-#include "libserver.h"
+#define ISVALIDSOCKET(s)    (s >= 0)
+#define CLOSESOCKET(s)  close(s)
+#define SOCKET  int
+#define GETSOCKETERRNO()    (errno)
+
+#ifndef AI_ALL
+#define AI_ALL 0x0100
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h> 
 
-#define DATA_LEN 20
+#define idPD 0x028e
+#define idVD 0x045e
+#define ADD_IN 0x81;
+#define ADD_OUT 0x02;
+#define DATA_LEN 20 
+ 
+const unsigned char bBreak[] = { 0x00, 0x14, 0x30, 0x03, 0xff, 0xff};
+  
+// retorna 1 se a combinação de botoes indicar SAÍDA do programa
+int cmdSAIDA(const unsigned char* _1) { 
+
+    for (int i = 0; i < 6; i++) {
+ 
+        if (_1[i] != bBreak[i]) { 
+            return 0;}
+    }
+    return 1;
+}
 
 int main() {
 
